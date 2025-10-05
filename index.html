@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Charles!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 5rem 2rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 3;
+        }
+
+        /* --- Animations --- */
+        @keyframes slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes slide-out { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes zoom-in { from { transform: scale(1.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes zoom-out { from { transform: scale(1); opacity: 1; } to { transform: scale(0.8); opacity: 0; } }
+
+        .slide-in { animation: slide-in 0.6s ease-out forwards; }
+        .slide-out { animation: slide-out 0.6s ease-out forwards; }
+        .fade-in { animation: fade-in 0.6s ease-out forwards; }
+        .fade-out { animation: fade-out 0.6s ease-out forwards; }
+        .zoom-in { animation: zoom-in 0.6s ease-out forwards; }
+        .zoom-out { animation: zoom-out 0.6s ease-out forwards; }
+
+
+        @keyframes gradient-bg { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.7); } 50% { box-shadow: 0 0 35px 15px rgba(255, 255, 255, 0.9); } }
+        @keyframes text-glow { 0%, 100% { text-shadow: 0 0 10px #fff, 0 0 20px #ff00de, 0 0 30px #ff00de; } 50% { text-shadow: 0 0 20px #fff, 0 0 30px #00f, 0 0 40px #00f; } }
+        @keyframes scroll-text { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        @keyframes progress-segment-fill { from { width: 0%; } to { width: 100%; } }
+        @keyframes montage-image-fade { 0%, 100% { opacity: 0; transform: scale(0.95) rotate(-3deg); } 10%, 90% { opacity: 1; transform: scale(1) rotate(2deg); } }
+
+        /* --- Slide Backgrounds --- */
+        #slide-0 { background: #000; opacity: 1; }
+        #slide-1 { background: linear-gradient(45deg, #ff00d4, #00f7ff, #f3ff00, #9d00ff); background-size: 400% 400%; animation: gradient-bg 15s ease infinite; }
+        #slide-2 { background: linear-gradient(135deg, #1d1a23, #0f0c14); }
+        #slide-3 { background: #000; }
+        #slide-4 { background: linear-gradient(-45deg, #8A2387, #E94057, #F27121); background-size: 400% 400%; animation: gradient-bg 15s ease infinite;}
+        #slide-5 { background-color: #000; }
+        #slide-6 { background: #000; }
+        #slide-7 { background: linear-gradient(200deg, #654ea3, #eaafc8); background-size: 200% 200%; animation: gradient-bg 10s ease infinite;}
+        #slide-8 { background: #000;}
+        #slide-9 { background: #000; }
+        #slide-10 { background: #000; }
+        #slide-11 { background: #000; }
+        #slide-12 { background: #000; }
+
+        .intro-btn { animation: glow 2s ease-in-out infinite; transition: transform 0.3s ease; }
+        .intro-btn:hover { transform: scale(1.1); }
+
+        .stat-item, .fact-item { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .final-greeting { animation: text-glow 2s ease-in-out infinite; }
+
+        #retro-lines-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; opacity: 0.8; mix-blend-mode: screen; }
+
+        /* UI Elements */
+        #progress-bar-container { position: fixed; top: 10px; left: 10px; right: 10px; height: 4px; z-index: 101; display: flex; gap: 4px; }
+        .progress-segment { flex: 1; background-color: rgba(255, 255, 255, 0.3); border-radius: 2px; overflow: hidden; }
+        .progress-segment-inner { height: 100%; background-color: #fff; width: 0%; border-radius: 2px; transition: width 0.3s linear; }
+        .progress-segment.active .progress-segment-inner { animation: progress-segment-fill 6s linear forwards; }
+        .progress-segment.filled .progress-segment-inner { width: 100%; }
+        
+        #controls-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 1.5rem; z-index: 101; background: rgba(0,0,0,0.3); padding: 8px 20px; border-radius: 20px; }
+        .top-nav-btn { cursor: pointer; transition: opacity 0.2s ease, transform 0.2s ease; }
+        .top-nav-btn:hover { transform: scale(1.1); }
+        .top-nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+        
+        #footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #000; overflow: hidden; white-space: nowrap; z-index: 101; padding: 8px 0; display: flex; }
+        .footer-text-container { display: flex; flex-shrink: 0; animation: scroll-text 40s linear infinite; white-space: nowrap; }
+        .footer-text-container span { font-weight: 800; font-size: 1.25rem; background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 2rem; }
+        
+        #photo-montage-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 0.3s ease-in-out; background-color: #000; display: flex; justify-content: center; align-items: center; }
+        #photo-montage-container.active { opacity: 1; z-index: 100; pointer-events: auto; }
+        #photo-montage-container img { position: absolute; max-width: 400px; width: 60vw; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #zigzag-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+
+        #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        
+        .carousel-item { display: none; transition: opacity 0.5s ease-in-out; }
+        .carousel-item.active { display: block; }
+        
+        /* Letter animation */
+        .animate-letters-char {
+            display: inline-block;
+            opacity: 0;
+            transform: translate(0, 20px) rotate(10deg);
+            transition: opacity 0.5s, transform 0.5s;
+            transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+    </style>
+</head>
+<body class="bg-black text-white overflow-hidden">
+
+    <audio id="background-music" loop>
+        <source src="background-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="progress-bar-container" class="hidden"></div>
+    
+    <div id="controls-container" class="hidden">
+        <div id="top-prev-btn" class="top-nav-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </div>
+        <div id="pause-play-btn" class="cursor-pointer">
+             <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+             <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </div>
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        <div id="top-next-btn" class="top-nav-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+    </div>
+
+    <div id="slides-container" class="relative w-screen h-screen">
+        <canvas id="retro-lines-canvas"></canvas>
+        <div id="photo-montage-container">
+            <canvas id="zigzag-canvas"></canvas>
+        </div>
+
+        <!-- Slide 0: Intro -->
+        <div id="slide-0" class="slide active" data-transition-out="zoom-out">
+            <button id="start-btn" class="intro-btn bg-white text-black font-bold text-xl md:text-3xl py-4 px-8 md:py-6 md:px-12 rounded-full">
+                Hi, Charles
+            </button>
+        </div>
+
+        <!-- Slide 1: Title Screen -->
+        <div id="slide-1" class="slide" data-transition-in="zoom-in" data-transition-out="slide-out">
+            <h1 class="text-4xl md:text-7xl font-black font-montserrat tracking-tighter uppercase animate-letters">Your Life 2025: <span class="text-yellow-300">Wrapped</span></h1>
+            <p class="mt-4 text-2xl md:text-4xl font-bold animate-letters">HAPPY BIRTHDAY, <span class="text-pink-400">CHARLES</span> 🎂</p>
+        </div>
+
+        <!-- Slide 2: Lifetime Stats -->
+        <div id="slide-2" class="slide" data-transition-in="slide-in" data-transition-out="fade-out">
+             <h2 class="text-3xl md:text-5xl font-bold mb-8 animate-letters">👋 Hey Charles, You’ve been alive for:</h2>
+             <div class="text-lg md:text-xl w-full max-w-md mx-auto flex flex-col items-stretch text-left">
+                 <div class="stat-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-cyan-300 stat-value" data-value="7306">0</b> days</p></div>
+                 <div class="stat-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-pink-400 stat-value" data-value="1044">0</b> weeks + 4 days</p></div>
+                 <div class="stat-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-yellow-300 stat-value" data-value="240">0</b> months</p></div>
+                 <div class="stat-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-green-400 stat-value" data-value="175344">0</b> hours</p></div>
+                 <div class="stat-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-purple-400 stat-value" data-value="10520640">0</b> minutes</p></div>
+                 <div class="stat-item py-3"><p class="whitespace-nowrap"><b class="text-red-400 stat-value" data-value="631238400">0</b> seconds</p></div>
+             </div>
+        </div>
+
+        <!-- Slide 3: Cosmic Facts -->
+        <div id="slide-3" class="slide" data-transition-in="fade-in" data-transition-out="zoom-out">
+            <h2 class="text-3xl md:text-5xl font-bold mb-8 animate-letters">💫 The universe has kept moving with you:</h2>
+            <div class="text-lg md:text-xl w-full max-w-2xl mx-auto flex flex-col items-stretch text-left">
+                <div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">🌙 About <b class="text-purple-300">240 full moons</b> since you were born.</p></div>
+                <div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">☀️ The Earth orbited the sun <b class="text-purple-300">19.99 times</b> with you riding along.</p></div>
+                <div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">🚀 Light has traveled <b class="text-purple-300">69.4 trillion miles</b> since your very first cry.</p></div>
+                <div class="fact-item py-3"><p class="whitespace-nowrap">🪐 Fun fact: <b class="text-purple-300">Pluto was still a planet</b> when you showed up.</p></div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Pop Culture 2005 -->
+        <div id="slide-4" class="slide" data-transition-in="zoom-in" data-transition-out="slide-out">
+            <h2 class="text-3xl md:text-5xl font-bold mb-8 animate-letters">🎶 Here’s what the world was vibing with in <span class="text-orange-400">2005</span>:</h2>
+            <div class="text-lg md:text-xl w-full max-w-2xl mx-auto flex flex-col items-stretch text-left">
+                <div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">#1 Song: <b class="text-orange-300">Gold Digger</b> by Kanye West ft. Jamie Foxx</p></div>
+                <div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">#1 Movie: <b class="text-orange-300">Wallace & Gromit: The Curse of the Were-Rabbit</b></p></div>
+                <div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-orange-300">YouTube</b> had just launched.</p></div>
+                <div class="fact-item py-3"><p class="whitespace-nowrap">The <b class="text-orange-300">Xbox 360</b> was weeks away from release.</p></div>
+            </div>
+        </div>
+        
+        <!-- Other slides with data-transition attributes -->
+        <div id="slide-5" class="slide" data-transition-in="slide-in" data-transition-out="fade-out"><h2 class="text-3xl md:text-5xl font-bold mb-8 animate-letters">🌍 Your birth year snapshot:</h2><div class="text-lg md:text-xl w-full max-w-xl mx-auto flex flex-col items-stretch text-left"><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-gray-300">Facebook</b> was only 1 year old.</p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-gray-300">Nokia phones</b> ruled the world.</p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-gray-300">Windows XP</b> was the star OS.</p></div><div class="fact-item py-3"><p class="whitespace-nowrap">World population: <b class="text-gray-300">6.5 billion</b> (now 8.1 billion).</p></div></div></div>
+        <div id="slide-6" class="slide" data-transition-in="fade-in" data-transition-out="zoom-out"><h2 class="text-3xl md:text-5xl font-bold mb-8 animate-letters">✨ You’ve already survived:</h2><div class="text-lg md:text-xl w-full max-w-lg mx-auto flex flex-col items-stretch text-left"><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-yellow-300">4 leap years</b> (2008, 2012, 2016, 2020)</p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-yellow-300">2 global recessions</b></p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap"><b class="text-yellow-300">1 worldwide pandemic</b></p></div><div class="fact-item py-3"><p class="whitespace-nowrap"><b class="text-yellow-300">Infinite memes</b> 🤯</p></div></div></div>
+        <div id="slide-7" class="slide" data-transition-in="zoom-in" data-transition-out="slide-out"><h2 class="text-3xl md:text-5xl font-bold mb-8 animate-letters">🔮 Here’s your <span class="text-pink-300">2025</span> stat drop:</h2><div class="text-lg md:text-xl w-full max-w-2xl mx-auto flex flex-col items-stretch text-left"><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">You’re turning <b class="text-pink-200">20 years old</b> → two decades of you.</p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">That’s <b class="text-pink-200">1/5</b> of a century.</p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">If you live to 80, you’ve completed <b class="text-pink-200">25%</b> of your journey.</p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">You’ve spent <b class="text-pink-200">~14,000+</b> hours in school already.</p></div><div class="fact-item py-3"><p class="whitespace-nowrap">Your heart has beaten <b class="text-pink-200 stat-value" data-value="757000000">0</b>+ times.</p></div></div></div>
+        <div id="slide-8" class="slide" data-transition-in="slide-in" data-transition-out="fade-out"><h2 class="text-3xl md:text-5xl font-bold mb-8 animate-letters">💡 Birthday math & vibes:</h2><div class="text-lg md:text-xl w-full max-w-md mx-auto flex flex-col items-stretch text-left"><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">Born 10th month, 6th day → <b class="text-blue-300">10 + 6 = 16</b> (Lucky number).</p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">Zodiac: <b class="text-blue-300">Libra ♎</b></p></div><div class="fact-item py-3 border-b border-white/20"><p class="whitespace-nowrap">Chinese Zodiac: <b class="text-blue-300">Rooster 🐓</b></p></div><div class="fact-item py-3"><p class="whitespace-nowrap">Birthstone: <b class="text-blue-300">Opal ✨</b></p></div></div></div>
+        <div id="slide-9" class="slide" data-transition-in="fade-in" data-transition-out="zoom-out"><p class="text-3xl md:text-5xl font-bold leading-tight max-w-4xl animate-letters">⚡ Hey Charles,</span> You are <b class="text-pink-400">7,306 days</b> of stories, <b class="text-yellow-300">175,344 hours</b> of living, and <b class="text-green-300">10.5 million minutes</b> of growth — and the best is still ahead.</p></div>
+        <div id="slide-10" class="slide" data-transition-in="zoom-in" data-transition-out="slide-out"><h2 class="text-2xl md:text-4xl font-bold mb-8 animate-letters">A message from your boyfriend, yours truly:</h2><div class="bg-white/10 p-8 rounded-2xl max-w-2xl w-full border border-white/20 space-y-6"><blockquote class="text-lg md:text-xl text-left italic border-l-4 border-cyan-400 pl-4"><p>“You are so beautiful. The best part of every day is when I catch a glimpse of you, even if it’s just for a few moments.”</p><cite class="text-right block not-italic mt-2 text-sm">— Intuition by C.J. Omololu</cite></blockquote></div></div>
+        <div id="slide-11" class="slide" data-transition-in="fade-in" data-transition-out="zoom-out"><h2 class="text-3xl md:text-5xl font-bold mb-8 animate-letters">A few of our favorite moments...</h2><div id="photo-carousel" class="relative w-full max-w-lg h-64 md:h-96 bg-black rounded-lg overflow-hidden shadow-2xl"></div></div>
+
+        <!-- Slide 12: Final Greeting -->
+        <div id="slide-12" class="slide" data-transition-in="zoom-in">
+            <canvas id="confetti-canvas"></canvas>
+            <h1 class="text-5xl md:text-8xl font-black font-montserrat tracking-tighter uppercase final-greeting">🎉 HAPPY 20TH BIRTHDAY, CHARLES 🎉</h1>
+            <button id="restart-btn" class="mt-12 bg-pink-500 text-white font-bold py-3 px-6 rounded-full hover:bg-pink-600 transition-colors"> Restart Animation </button>
+        </div>
+    </div>
+    
+    <footer id="footer-bar" class="hidden">
+        <div class="footer-text-container">
+            <span>HAPPY BIRTHDAY CHARLES 🎉 </span>
+            <span>HAPPY BIRTHDAY CHARLES 🎉 </span>
+            <span>HAPPY BIRTHDAY CHARLES 🎉 </span>
+        </div>
+        <div class="footer-text-container">
+            <span>HAPPY BIRTHDAY CHARLES 🎉 </span>
+            <span>HAPPY BIRTHDAY CHARLES 🎉 </span>
+            <span>HAPPY BIRTHDAY CHARLES 🎉 </span>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const slides = document.querySelectorAll('.slide');
+            const startBtn = document.getElementById('start-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            const topNextBtn = document.getElementById('top-next-btn');
+            const topPrevBtn = document.getElementById('top-prev-btn');
+            const progressBarContainer = document.getElementById('progress-bar-container');
+            const controlsContainer = document.getElementById('controls-container');
+            const footerBar = document.getElementById('footer-bar');
+            const pausePlayBtn = document.getElementById('pause-play-btn');
+            const pauseIcon = document.getElementById('pause-icon');
+            const playIcon = document.getElementById('play-icon');
+            const montageContainer = document.getElementById('photo-montage-container');
+            const carouselContainer = document.getElementById('photo-carousel');
+            const confettiCanvas = document.getElementById('confetti-canvas');
+            const retroCanvas = document.getElementById('retro-lines-canvas');
+            const backgroundMusic = document.getElementById('background-music');
+
+            // --- State and Config ---
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            let autoAdvanceTimer;
+            let isPaused = false;
+            let currentPalette = [];
+            let confettiAnimationId;
+            let time = 0;
+            let zigzagAnimationId;
+            let zigzagTime = 0;
+            let zigzagTargetIndex = 0;
+            
+            // --- Function Declarations ---
+            let triggerCountUp, triggerFactAnimation, renderCarousel, showPhoto, startConfetti, stopConfetti, animateRetro, startZigzagAnimation, stopZigzagAnimation, animateLetters;
+
+            const slidePalettes = { 'slide-0': [], 'slide-1': ['#FF005E', '#D4004F', '#A8003F', '#7C002F', '#50001F'], 'slide-2': ['#00F7FF', '#00D3E2', '#00AEC5', '#0089A8', '#00648B'], 'slide-3': ['#9D00FF', '#8600E3', '#6F00C7', '#5800AB', '#41008F'], 'slide-4': ['#E94057', '#D33A4E', '#BD3445', '#A72E3C', '#912833'], 'slide-5': ['#FFFFFF', '#D9D9D9', '#B3B3B3', '#8C8C8C', '#666666'], 'slide-6': ['#F3FF00', '#DDE600', '#C7CC00', '#B0B300', '#9A9900'], 'slide-7': ['#EAAFC8', '#DE9CB9', '#D289AA', '#C6769B', '#B9638C'], 'slide-8': ['#2a2a72', '#242463', '#1E1E55', '#181846', '#121238'], 'slide-9': ['#009FFD', '#008ADF', '#0075C2', '#0061A4', '#004C87'], 'slide-10': ['#FF3B81', '#FF6C9E', '#FF8FB8', '#FFB2D1', '#FFD5EA'], 'slide-11': [], 'slide-12': ['#FFFFFF', '#FF005E', '#00F7FF', '#F3FF00', '#9D00FF'] };
+            const montagePhotos = [ 'transition_photo_1.jpg', 'transition_photo_2.jpg', 'transition_photo_3.jpg', 'transition_photo_4.jpg', 'transition_photo_5.jpg' ];
+            const carouselPhotos = [ 'gallery_photo_1.jpg', 'gallery_photo_2.jpg', 'gallery_photo_3.jpg', 'gallery_photo_4.jpg', 'gallery_photo_5.jpg' ];
+            let currentPhotoIndex = 0;
+
+            const initProgressBars = () => {
+                progressBarContainer.innerHTML = '';
+                for (let i = 0; i < totalSlides - 2; i++) {
+                    const segment = document.createElement('div'); segment.className = 'progress-segment';
+                    const inner = document.createElement('div'); inner.className = 'progress-segment-inner';
+                    segment.appendChild(inner); progressBarContainer.appendChild(segment);
+                }
+            };
+
+            const updateProgressBars = (index) => {
+                const segments = progressBarContainer.querySelectorAll('.progress-segment');
+                segments.forEach((segment, i) => {
+                    segment.classList.remove('active', 'filled');
+                    const inner = segment.querySelector('.progress-segment-inner');
+                    if(inner) inner.style.animation = 'none';
+                    if (i < index - 1) { segment.classList.add('filled'); } else if (i === index - 1) { segment.classList.add('active'); }
+                });
+            };
+
+            const showSlide = (index) => {
+                if (index < 0 || index >= totalSlides) return;
+                
+                if (index > 0) { 
+                    progressBarContainer.classList.remove('hidden'); 
+                    controlsContainer.classList.remove('hidden'); 
+                    footerBar.classList.remove('hidden');
+                    if(index === 1 && !isPaused) backgroundMusic.play();
+                } else { 
+                    progressBarContainer.classList.add('hidden'); 
+                    controlsContainer.classList.add('hidden'); 
+                    footerBar.classList.add('hidden'); 
+                    initProgressBars(); 
+                    backgroundMusic.pause();
+                    backgroundMusic.currentTime = 0;
+                }
+                
+                const currentActive = document.querySelector('.slide.active');
+                const newSlide = slides[index];
+                
+                if (currentActive && currentActive !== newSlide) {
+                    const outAnim = currentActive.dataset.transitionOut || 'fade-out';
+                    currentActive.classList.add(outAnim);
+                    currentActive.classList.remove('active');
+                    setTimeout(() => {
+                        currentActive.classList.remove(outAnim);
+                        currentActive.style.opacity = 0; // hide after animation
+                    }, 600);
+                }
+                
+                const inAnim = newSlide.dataset.transitionIn || 'fade-in';
+                newSlide.classList.add('active', inAnim);
+                setTimeout(() => newSlide.classList.remove(inAnim), 600);
+                
+                currentSlide = index;
+
+                currentPalette = slidePalettes[newSlide.id] || [];
+                
+                newSlide.querySelectorAll('.animate-letters').forEach(el => animateLetters(el));
+                if (newSlide.id === 'slide-2' || newSlide.id === 'slide-7') { triggerCountUp(newSlide); }
+                if (newSlide.id.match(/slide-[3-9]|slide-10/)) { triggerFactAnimation(newSlide); }
+                if (newSlide.id === 'slide-12') { startConfetti(); } else { stopConfetti(); }
+                
+                updateNavButtons();
+                updateProgressBars(index);
+                resetAutoAdvance();
+            };
+            
+            const playMontageTransition = (targetIndex) => {
+                const currentActive = document.querySelector('.slide.active');
+                if(currentActive){
+                    const outAnim = currentActive.dataset.transitionOut || 'fade-out';
+                    currentActive.classList.add(outAnim);
+                    currentActive.classList.remove('active');
+                    setTimeout(() => currentActive.classList.remove(outAnim), 600);
+                }
+                
+                retroCanvas.style.display = 'none';
+
+                montageContainer.innerHTML = '<canvas id="zigzag-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;"></canvas>';
+                const img = document.createElement('img');
+                img.src = montagePhotos[Math.floor(Math.random() * montagePhotos.length)];
+                img.style.animation = 'montage-image-fade 6s ease-in-out forwards';
+                img.style.position = 'relative';
+                montageContainer.appendChild(img);
+                montageContainer.classList.add('active');
+                startZigzagAnimation(targetIndex);
+
+                setTimeout(() => {
+                    montageContainer.classList.remove('active');
+                    stopZigzagAnimation();
+                    retroCanvas.style.display = 'block';
+                    showSlide(targetIndex);
+                }, 6000);
+            };
+
+            const next = () => {
+                const nextIndex = currentSlide + 1; if (nextIndex >= totalSlides) return;
+                clearTimeout(autoAdvanceTimer);
+                if (currentSlide > 0 && currentSlide < 10) { playMontageTransition(nextIndex); } else { showSlide(nextIndex); }
+            };
+
+            const prev = () => { const prevIndex = currentSlide - 1; if (prevIndex < 0) return; showSlide(prevIndex); };
+            const restart = () => showSlide(0);
+
+            const updateNavButtons = () => { topPrevBtn.classList.toggle('disabled', currentSlide <= 1); topNextBtn.classList.toggle('disabled', currentSlide >= totalSlides - 1); };
+            const resetAutoAdvance = () => { clearTimeout(autoAdvanceTimer); if (currentSlide > 0 && currentSlide < totalSlides - 1 && !isPaused) { autoAdvanceTimer = setTimeout(next, 6000); } };
+            
+            const togglePause = () => {
+                isPaused = !isPaused;
+                pauseIcon.classList.toggle('hidden', isPaused); playIcon.classList.toggle('hidden', !isPaused);
+                const activeSegment = progressBarContainer.querySelector('.progress-segment.active .progress-segment-inner');
+                if (isPaused) { 
+                    clearTimeout(autoAdvanceTimer); 
+                    if (activeSegment) activeSegment.style.animationPlayState = 'paused';
+                    backgroundMusic.pause();
+                } 
+                else { 
+                    if (activeSegment) activeSegment.style.animationPlayState = 'running'; 
+                    resetAutoAdvance(); 
+                    if(currentSlide > 0) backgroundMusic.play();
+                }
+            };
+
+            animateLetters = (element) => {
+                if (element.dataset.animated === 'true') return;
+                element.dataset.animated = 'true';
+
+                const childNodes = Array.from(element.childNodes);
+                element.innerHTML = '';
+
+                childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const text = node.textContent;
+                        Array.from(text).forEach(char => {
+                            const span = document.createElement('span');
+                            span.className = 'animate-letters-char';
+                            span.innerHTML = char === ' ' ? '&nbsp;' : char;
+                            element.appendChild(span);
+                        });
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        const wrapper = document.createElement('span');
+                        wrapper.className = 'animate-letters-char';
+                        wrapper.appendChild(node.cloneNode(true));
+                        element.appendChild(wrapper);
+                    }
+                });
+
+                element.querySelectorAll('.animate-letters-char').forEach((span, i) => {
+                    setTimeout(() => {
+                        span.style.opacity = '1';
+                        span.style.transform = 'translate(0, 0) rotate(0)';
+                    }, 50 + i * 30);
+                });
+            };
+            
+            triggerFactAnimation = (slide) => {
+                const items = slide.querySelectorAll('.stat-item, .fact-item');
+                items.forEach((item, index) => { setTimeout(() => { item.style.opacity = '1'; item.style.transform = 'translateY(0)'; }, 800 + (index + 1) * 250); });
+            };
+            triggerCountUp = (slide) => {
+                const counters = slide.querySelectorAll('.stat-value');
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute('data-value');
+                    counter.innerText = '0'; let current = 0;
+                    const updateCount = () => {
+                        const increment = target / 100; if (target > 0 && increment === 0) { counter.innerText = target.toLocaleString(); return; }
+                        current += increment;
+                        if (current < target) { counter.innerText = Math.ceil(current).toLocaleString(); requestAnimationFrame(updateCount); } else { counter.innerText = target.toLocaleString(); }
+                    };
+                    setTimeout(updateCount, 800);
+                });
+                triggerFactAnimation(slide);
+            };
+            renderCarousel = () => {
+                carouselContainer.innerHTML = ''; carouselPhotos.forEach((src, index) => {
+                    const img = document.createElement('img'); img.src = src; img.className = `carousel-item absolute w-full h-full object-cover ${index === currentPhotoIndex ? 'active' : ''}`; carouselContainer.appendChild(img);
+                });
+                const carouselPrevBtn = document.createElement('button'); carouselPrevBtn.id = 'carousel-prev'; carouselPrevBtn.innerHTML = '&lt;'; carouselPrevBtn.className = "absolute top-1/2 left-2 -translate-y-1/2 bg-white/20 p-2 rounded-full z-10"; carouselPrevBtn.addEventListener('click', (e) => { e.stopPropagation(); showPhoto(currentPhotoIndex - 1); });
+                const carouselNextBtn = document.createElement('button'); carouselNextBtn.id = 'carousel-next'; carouselNextBtn.innerHTML = '&gt;'; carouselNextBtn.className = "absolute top-1/2 right-2 -translate-y-1/2 bg-white/20 p-2 rounded-full z-10"; carouselNextBtn.addEventListener('click', (e) => { e.stopPropagation(); showPhoto(currentPhotoIndex + 1); });
+                carouselContainer.appendChild(carouselPrevBtn); carouselContainer.appendChild(carouselNextBtn);
+            };
+            showPhoto = (index) => {
+                currentPhotoIndex = (index + carouselPhotos.length) % carouselPhotos.length;
+                const items = carouselContainer.querySelectorAll('.carousel-item');
+                items.forEach((item, i) => { item.classList.toggle('active', i === currentPhotoIndex); });
+            };
+            const retroCtx = retroCanvas.getContext('2d');
+            const resizeRetroCanvas = () => { retroCanvas.width = window.innerWidth; retroCanvas.height = window.innerHeight; };
+            const drawSpotifyShape = (yOffset, height, reversed = false) => {
+                if (!currentPalette || currentPalette.length === 0) return;
+                const step = height / currentPalette.length;
+                for (let i = 0; i < currentPalette.length; i++) {
+                    retroCtx.fillStyle = currentPalette[i]; retroCtx.beginPath();
+                    const y = yOffset + i * step; const waveOffset = Math.sin(time + y * 0.1) * 10;
+                    if(reversed) { retroCtx.moveTo(retroCanvas.width + 10, y + waveOffset); retroCtx.lineTo(retroCanvas.width + 10, y + step + waveOffset); retroCtx.lineTo(-10, y + step * 1.5); retroCtx.lineTo(-10, y + step * 0.5);
+                    } else { retroCtx.moveTo(-10, y + waveOffset); retroCtx.lineTo(-10, y + step + waveOffset); retroCtx.lineTo(retroCanvas.width + 10, y + step * 1.5); retroCtx.lineTo(retroCanvas.width + 10, y + step * 0.5); }
+                    retroCtx.closePath(); retroCtx.fill();
+                }
+            };
+            animateRetro = () => {
+                retroCtx.clearRect(0, 0, retroCanvas.width, retroCanvas.height); time += 0.02;
+                if (currentPalette.length > 0) { drawSpotifyShape(0, retroCanvas.height * 0.25, false); drawSpotifyShape(retroCanvas.height * 0.75, retroCanvas.height * 0.25, true); }
+                requestAnimationFrame(animateRetro);
+            };
+            
+            const animateZigzag = () => {
+                const zCanvas = document.getElementById('zigzag-canvas');
+                if (!zCanvas) return;
+                const zCtx = zCanvas.getContext('2d');
+                zCanvas.width = window.innerWidth; zCanvas.height = window.innerHeight;
+                zCtx.clearRect(0, 0, zCanvas.width, zCanvas.height);
+                zigzagTime += 0.05;
+                const palette = slidePalettes[slides[zigzagTargetIndex].id] || ['#fff'];
+                const drawLine = (startY, endY, color) => {
+                    zCtx.beginPath(); zCtx.moveTo(0, startY);
+                    for (let x = 0; x < zCanvas.width; x++) {
+                        const y = startY + (endY - startY) * (x / zCanvas.width) + Math.sin(x * 0.02 + zigzagTime) * 15;
+                        zCtx.lineTo(x, y);
+                    }
+                    zCtx.strokeStyle = color; zCtx.lineWidth = 4; zCtx.stroke();
+                };
+                drawLine(50, 150, palette[0]);
+                drawLine(zCanvas.height - 50, zCanvas.height - 150, palette[palette.length - 1]);
+                zigzagAnimationId = requestAnimationFrame(animateZigzag);
+            }
+            startZigzagAnimation = (targetIndex) => {
+                zigzagTime = 0; zigzagTargetIndex = targetIndex;
+                if(zigzagAnimationId) cancelAnimationFrame(zigzagAnimationId);
+                animateZigzag();
+            };
+            stopZigzagAnimation = () => { if(zigzagAnimationId) cancelAnimationFrame(zigzagAnimationId); };
+
+            const confettiCtx = confettiCanvas.getContext('2d');
+            let confettiParticles = []; const confettiColors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
+            const resizeConfettiCanvas = () => { confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; };
+            class ConfettiParticle { constructor() { this.x = Math.random() * confettiCanvas.width; this.y = Math.random() * confettiCanvas.height - confettiCanvas.height; this.size = Math.random() * 5 + 2; this.speed = Math.random() * 5 + 1; this.angle = Math.random() * 360; this.color = confettiColors[Math.floor(Math.random() * confettiColors.length)]; } update() { this.y += this.speed; if (this.y > confettiCanvas.height) { this.y = -10; this.x = Math.random() * confettiCanvas.width; } } draw() { confettiCtx.fillStyle = this.color; confettiCtx.fillRect(this.x, this.y, this.size, this.size); } }
+            const animateConfetti = () => { if(!confettiCtx) return; confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); confettiParticles.forEach(p => { p.update(); p.draw(); }); confettiAnimationId = requestAnimationFrame(animateConfetti); };
+            startConfetti = () => { resizeConfettiCanvas(); const particleCount = 200; confettiParticles = []; for (let i = 0; i < particleCount; i++) { confettiParticles.push(new ConfettiParticle()); } if (!confettiAnimationId) { animateConfetti(); } };
+            stopConfetti = () => { cancelAnimationFrame(confettiAnimationId); confettiAnimationId = null; if (confettiCtx) { confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); } };
+            
+            // --- Event Listeners ---
+            startBtn.addEventListener('click', () => showSlide(1));
+            restartBtn.addEventListener('click', restart);
+            topNextBtn.addEventListener('click', next);
+            topPrevBtn.addEventListener('click', prev);
+            pausePlayBtn.addEventListener('click', togglePause);
+            window.addEventListener('resize', () => { resizeRetroCanvas(); resizeConfettiCanvas(); });
+            document.addEventListener('keydown', e => { if(currentSlide === 0) return; if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); });
+            let touchstartX = 0; let touchendX = 0;
+            document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, { passive: true });
+            document.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); });
+            function handleSwipe() { if(currentSlide === 0 || currentSlide === 11) return; const swipeThreshold = 50; if (touchendX < touchstartX - swipeThreshold) { next(); } if (touchendX > touchstartX + swipeThreshold) { prev(); } }
+
+            // --- Initial Setup ---
+            initProgressBars();
+            renderCarousel();
+            resizeRetroCanvas();
+            animateRetro();
+        });
+    </script>
+</body>
+</html>
+
