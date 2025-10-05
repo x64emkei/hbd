@@ -19,6 +19,11 @@
         .font-montserrat {
             font-family: 'Montserrat', sans-serif;
         }
+        
+        /* Utility to make emojis render properly */
+        .emoji {
+            font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+        }
 
         .slide {
             width: 100%;
@@ -32,14 +37,15 @@
             align-items: center;
             text-align: center;
             padding: 5rem 1rem; /* Adjusted padding for mobile */
-            opacity: 0;
+            opacity: 1;
             pointer-events: none;
             z-index: 2;
-            transform: translateX(100%); /* Start off-screen to the right */
+            transform: translateX(100%);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .slide:first-child {
-            transform: translateX(0); /* First slide starts in view */
+            transform: translateX(0);
         }
 
         @media (min-width: 768px) {
@@ -49,20 +55,18 @@
         }
         
         .slide.active {
-            opacity: 1;
             transform: translateX(0);
             pointer-events: auto;
             z-index: 3;
-            transition: transform 0.6s ease-out, opacity 0.6s ease-out;
         }
 
-        .slide.exit {
+        .slide.exit-to-left {
             transform: translateX(-100%);
-            opacity: 1;
-            z-index: 2;
-            transition: transform 0.6s ease-out, opacity 0.6s ease-out;
         }
 
+        .slide.exit-to-right {
+            transform: translateX(100%);
+        }
 
         /* --- Animations --- */
         @keyframes gradient-bg { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -73,7 +77,7 @@
         @keyframes montage-image-fade { 0%, 100% { opacity: 0; transform: scale(0.95) rotate(-3deg); } 10%, 90% { opacity: 1; transform: scale(1) rotate(2deg); } }
 
         /* --- Slide Backgrounds --- */
-        #slide-0 { background: #000; opacity: 1; }
+        #slide-0 { background: #000; }
         #slide-1 { background: linear-gradient(45deg, #ff00d4, #00f7ff, #f3ff00, #9d00ff); background-size: 400% 400%; animation: gradient-bg 15s ease infinite; }
         #slide-2 { background: linear-gradient(135deg, #1d1a23, #0f0c14); }
         #slide-3 { background: #000; }
@@ -94,14 +98,8 @@
         .final-greeting { animation: text-glow 2s ease-in-out infinite; }
 
         .fact-list p {
-            white-space: normal; /* Allow wrapping on mobile */
+            white-space: normal; /* Allow wrapping on all screens */
         }
-        @media (min-width: 768px) {
-            .fact-list p {
-                white-space: nowrap; /* No wrap on desktop */
-            }
-        }
-
 
         #retro-lines-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; opacity: 0.8; mix-blend-mode: screen; }
 
@@ -170,64 +168,64 @@
         </div>
 
         <!-- Slide 0: Intro -->
-        <div id="slide-0" class="slide active" data-transition-out="zoom-out">
+        <div id="slide-0" class="slide active">
             <button id="start-btn" class="intro-btn bg-white text-black font-bold text-xl md:text-3xl py-4 px-8 md:py-6 md:px-12 rounded-full">
                 Hi, Charles
             </button>
         </div>
 
         <!-- Slide 1: Title Screen -->
-        <div id="slide-1" class="slide" data-transition-in="zoom-in" data-transition-out="slide-out">
+        <div id="slide-1" class="slide">
             <h1 class="text-3xl sm:text-4xl md:text-7xl font-black font-montserrat tracking-tighter uppercase animate-letters">Your Life 2025: <span class="text-yellow-300">Wrapped</span></h1>
-            <p class="mt-4 text-xl sm:text-2xl md:text-4xl font-bold animate-letters">HAPPY BIRTHDAY, <span class="text-pink-400">CHARLES</span> 🎂</p>
+            <p class="mt-4 text-xl sm:text-2xl md:text-4xl font-bold animate-letters">HAPPY BIRTHDAY, <span class="text-pink-400">CHARLES</span> <span class="emoji">🎂</span></p>
         </div>
 
         <!-- Slide 2: Lifetime Stats -->
-        <div id="slide-2" class="slide" data-transition-in="slide-in" data-transition-out="fade-out">
-             <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">👋 Hey Charles, You’ve been alive for:</h2>
-             <div class="text-sm sm:text-base md:text-xl w-full max-w-md mx-auto flex flex-col items-center md:items-stretch text-center md:text-left fact-list">
-                 <div class="stat-item py-3 border-b border-white/20 w-full"><p><b class="text-cyan-300 stat-value" data-value="7306">0</b> days</p></div>
-                 <div class="stat-item py-3 border-b border-white/20 w-full"><p><b class="text-pink-400 stat-value" data-value="1044">0</b> weeks + 4 days</p></div>
-                 <div class="stat-item py-3 border-b border-white/20 w-full"><p><b class="text-yellow-300 stat-value" data-value="240">0</b> months</p></div>
-                 <div class="stat-item py-3 border-b border-white/20 w-full"><p><b class="text-green-400 stat-value" data-value="175344">0</b> hours</p></div>
-                 <div class="stat-item py-3 border-b border-white/20 w-full"><p><b class="text-purple-400 stat-value" data-value="10520640">0</b> minutes</p></div>
-                 <div class="stat-item py-3 w-full"><p><b class="text-red-400 stat-value" data-value="631238400">0</b> seconds</p></div>
+        <div id="slide-2" class="slide">
+             <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters"><span class="emoji">👋</span> Hey Charles, You’ve been alive for:</h2>
+             <div class="text-sm sm:text-base md:text-xl w-full max-w-md mx-auto flex flex-col items-stretch text-left fact-list">
+                 <div class="stat-item py-3 border-b border-white/20"><p><b class="text-cyan-300 stat-value" data-value="7306">0</b> days</p></div>
+                 <div class="stat-item py-3 border-b border-white/20"><p><b class="text-pink-400 stat-value" data-value="1044">0</b> weeks + 4 days</p></div>
+                 <div class="stat-item py-3 border-b border-white/20"><p><b class="text-yellow-300 stat-value" data-value="240">0</b> months</p></div>
+                 <div class="stat-item py-3 border-b border-white/20"><p><b class="text-green-400 stat-value" data-value="175344">0</b> hours</p></div>
+                 <div class="stat-item py-3 border-b border-white/20"><p><b class="text-purple-400 stat-value" data-value="10520640">0</b> minutes</p></div>
+                 <div class="stat-item py-3"><p><b class="text-red-400 stat-value" data-value="631238400">0</b> seconds</p></div>
              </div>
         </div>
 
         <!-- Slide 3: Cosmic Facts -->
-        <div id="slide-3" class="slide" data-transition-in="fade-in" data-transition-out="zoom-out">
-            <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">💫 The universe has kept moving with you:</h2>
-            <div class="text-sm sm:text-base md:text-xl w-full max-w-2xl mx-auto flex flex-col items-center md:items-stretch text-center md:text-left fact-list">
-                <div class="fact-item py-3 border-b border-white/20 w-full"><p>🌙 About <b class="text-purple-300">240 full moons</b> since you were born.</p></div>
-                <div class="fact-item py-3 border-b border-white/20 w-full"><p>☀️ The Earth orbited the sun <b class="text-purple-300">19.99 times</b> with you riding along.</p></div>
-                <div class="fact-item py-3 border-b border-white/20 w-full"><p>🚀 Light has traveled <b class="text-purple-300">69.4 trillion miles</b> since your very first cry.</p></div>
-                <div class="fact-item py-3 w-full"><p>🪐 Fun fact: <b class="text-purple-300">Pluto was still a planet</b> when you showed up.</p></div>
+        <div id="slide-3" class="slide">
+            <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters"><span class="emoji">💫</span> The universe has kept moving with you:</h2>
+            <div class="text-sm sm:text-base md:text-xl w-full max-w-2xl mx-auto flex flex-col items-stretch text-left fact-list">
+                <div class="fact-item py-3 border-b border-white/20"><p><span class="emoji">🌙</span> About <b class="text-purple-300">240 full moons</b> since you were born.</p></div>
+                <div class="fact-item py-3 border-b border-white/20"><p><span class="emoji">☀️</span> The Earth orbited the sun <b class="text-purple-300">19.99 times</b> with you riding along.</p></div>
+                <div class="fact-item py-3 border-b border-white/20"><p><span class="emoji">🚀</span> Light has traveled <b class="text-purple-300">69.4 trillion miles</b> since your very first cry.</p></div>
+                <div class="fact-item py-3"><p><span class="emoji">🪐</span> Fun fact: <b class="text-purple-300">Pluto was still a planet</b> when you showed up.</p></div>
             </div>
         </div>
 
         <!-- Slide 4: Pop Culture 2005 -->
-        <div id="slide-4" class="slide" data-transition-in="zoom-in" data-transition-out="slide-out">
-            <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">🎶 Here’s what the world was vibing with in <span class="text-orange-400">2005</span>:</h2>
-            <div class="text-sm sm:text-base md:text-xl w-full max-w-2xl mx-auto flex flex-col items-center md:items-stretch text-center md:text-left fact-list">
-                <div class="fact-item py-3 border-b border-white/20 w-full"><p>#1 Song: <b class="text-orange-300">Gold Digger</b> by Kanye West ft. Jamie Foxx</p></div>
-                <div class="fact-item py-3 border-b border-white/20 w-full"><p>#1 Movie: <b class="text-orange-300">Wallace & Gromit: The Curse of the Were-Rabbit</b></p></div>
-                <div class="fact-item py-3 border-b border-white/20 w-full"><p><b class="text-orange-300">YouTube</b> had just launched.</p></div>
-                <div class="fact-item py-3 w-full"><p>The <b class="text-orange-300">Xbox 360</b> was weeks away from release.</p></div>
+        <div id="slide-4" class="slide">
+            <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters"><span class="emoji">🎶</span> Here’s what the world was vibing with in <span class="text-orange-400">2005</span>:</h2>
+            <div class="text-sm sm:text-base md:text-xl w-full max-w-2xl mx-auto flex flex-col items-stretch text-left fact-list">
+                <div class="fact-item py-3 border-b border-white/20"><p>#1 Song: <b class="text-orange-300">Gold Digger</b> by Kanye West ft. Jamie Foxx</p></div>
+                <div class="fact-item py-3 border-b border-white/20"><p>#1 Movie: <b class="text-orange-300">Wallace & Gromit: The Curse of the Were-Rabbit</b></p></div>
+                <div class="fact-item py-3 border-b border-white/20"><p><b class="text-orange-300">YouTube</b> had just launched.</p></div>
+                <div class="fact-item py-3"><p>The <b class="text-orange-300">Xbox 360</b> was weeks away from release.</p></div>
             </div>
         </div>
         
-        <!-- Other slides with data-transition attributes -->
-        <div id="slide-5" class="slide" data-transition-in="slide-in" data-transition-out="fade-out"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">🌍 Your birth year snapshot:</h2><div class="text-sm sm:text-base md:text-xl w-full max-w-xl mx-auto flex flex-col items-center md:items-stretch text-center md:text-left fact-list"><div class="fact-item py-3 border-b border-white/20 w-full"><p><b class="text-gray-300">Facebook</b> was only 1 year old.</p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p><b class="text-gray-300">Nokia phones</b> ruled the world.</p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p><b class="text-gray-300">Windows XP</b> was the star OS.</p></div><div class="fact-item py-3 w-full"><p>World population: <b class="text-gray-300">6.5 billion</b> (now 8.1 billion).</p></div></div></div>
-        <div id="slide-6" class="slide" data-transition-in="fade-in" data-transition-out="zoom-out"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">✨ You’ve already survived:</h2><div class="text-sm sm:text-base md:text-xl w-full max-w-lg mx-auto flex flex-col items-center md:items-stretch text-center md:text-left fact-list"><div class="fact-item py-3 border-b border-white/20 w-full"><p><b class="text-yellow-300">4 leap years</b> (2008, 2012, 2016, 2020)</p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p><b class="text-yellow-300">2 global recessions</b></p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p><b class="text-yellow-300">1 worldwide pandemic</b></p></div><div class="fact-item py-3 w-full"><p><b class="text-yellow-300">Infinite memes</b> 🤯</p></div></div></div>
-        <div id="slide-7" class="slide" data-transition-in="zoom-in" data-transition-out="slide-out"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">🔮 Here’s your <span class="text-pink-300">2025</span> stat drop:</h2><div class="text-sm sm:text-base md:text-xl w-full max-w-2xl mx-auto flex flex-col items-center md:items-stretch text-center md:text-left fact-list"><div class="fact-item py-3 border-b border-white/20 w-full"><p>You’re turning <b class="text-pink-200">20 years old</b> → two decades of you.</p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p>That’s <b class="text-pink-200">1/5</b> of a century.</p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p>If you live to 80, you’ve completed <b class="text-pink-200">25%</b> of your journey.</p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p>You’ve spent <b class="text-pink-200">~14,000+</b> hours in school already.</p></div><div class="fact-item py-3 w-full"><p>Your heart has beaten <b class="text-pink-200 stat-value" data-value="757000000">0</b>+ times.</p></div></div></div>
-        <div id="slide-8" class="slide" data-transition-in="slide-in" data-transition-out="fade-out"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">💡 Birthday math & vibes:</h2><div class="text-sm sm:text-base md:text-xl w-full max-w-md mx-auto flex flex-col items-center md:items-stretch text-center md:text-left fact-list"><div class="fact-item py-3 border-b border-white/20 w-full"><p>Born 10th month, 6th day → <b class="text-blue-300">10 + 6 = 16</b> (Lucky number).</p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p>Zodiac: <b class="text-blue-300">Libra ♎</b></p></div><div class="fact-item py-3 border-b border-white/20 w-full"><p>Chinese Zodiac: <b class="text-blue-300">Rooster 🐓</b></p></div><div class="fact-item py-3 w-full"><p>Birthstone: <b class="text-blue-300">Opal ✨</b></p></div></div></div>
-        <div id="slide-9" class="slide" data-transition-in="fade-in" data-transition-out="zoom-out"><p class="text-2xl sm:text-3xl md:text-5xl font-bold leading-tight max-w-4xl animate-letters">⚡ Hey Charles,</span> You are <b class="text-pink-400">7,306 days</b> of stories, <b class="text-yellow-300">175,344 hours</b> of living, and <b class="text-green-300">10.5 million minutes</b> of growth — and the best is still ahead.</p></div>
-        <div id="slide-10" class="slide" data-transition-in="zoom-in" data-transition-out="slide-out"><h2 class="text-xl sm:text-2xl md:text-4xl font-bold mb-8 animate-letters">A message from your boyfriend, yours truly:</h2><div class="bg-white/10 p-6 md:p-8 rounded-2xl max-w-2xl w-full border border-white/20 space-y-6"><blockquote class="text-base md:text-xl text-left italic border-l-4 border-cyan-400 pl-4"><p>“You are so beautiful. The best part of every day is when I catch a glimpse of you, even if it’s just for a few moments.”</p><cite class="text-right block not-italic mt-2 text-sm">— Intuition by C.J. Omololu</cite></blockquote></div></div>
-        <div id="slide-11" class="slide" data-transition-in="fade-in" data-transition-out="zoom-out"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">A few of our favorite moments...</h2><div id="photo-carousel" class="relative w-full max-w-lg h-64 md:h-96 bg-black rounded-lg overflow-hidden shadow-2xl"></div></div>
+        <!-- Other slides -->
+        <div id="slide-5" class="slide"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters"><span class="emoji">🌍</span> Your birth year snapshot:</h2><div class="text-sm sm:text-base md:text-xl w-full max-w-xl mx-auto flex flex-col items-stretch text-left fact-list"><div class="fact-item py-3 border-b border-white/20"><p><b class="text-gray-300">Facebook</b> was only 1 year old.</p></div><div class="fact-item py-3 border-b border-white/20"><p><b class="text-gray-300">Nokia phones</b> ruled the world.</p></div><div class="fact-item py-3 border-b border-white/20"><p><b class="text-gray-300">Windows XP</b> was the star OS.</p></div><div class="fact-item py-3"><p>World population: <b class="text-gray-300">6.5 billion</b> (now 8.1 billion).</p></div></div></div>
+        <div id="slide-6" class="slide"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters"><span class="emoji">✨</span> You’ve already survived:</h2><div class="text-sm sm:text-base md:text-xl w-full max-w-lg mx-auto flex flex-col items-stretch text-left fact-list"><div class="fact-item py-3 border-b border-white/20"><p><b class="text-yellow-300">4 leap years</b> (2008, 2012, 2016, 2020)</p></div><div class="fact-item py-3 border-b border-white/20"><p><b class="text-yellow-300">2 global recessions</b></p></div><div class="fact-item py-3 border-b border-white/20"><p><b class="text-yellow-300">1 worldwide pandemic</b></p></div><div class="fact-item py-3"><p><b class="text-yellow-300">Infinite memes</b> <span class="emoji">🤯</span></p></div></div></div>
+        <div id="slide-7" class="slide"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters"><span class="emoji">🔮</span> Here’s your <span class="text-pink-300">2025</span> stat drop:</h2><div class="text-sm sm:text-base md:text-xl w-full max-w-2xl mx-auto flex flex-col items-stretch text-left fact-list"><div class="fact-item py-3 border-b border-white/20"><p>You’re turning <b class="text-pink-200">20 years old</b> → two decades of you.</p></div><div class="fact-item py-3 border-b border-white/20"><p>That’s <b class="text-pink-200">1/5</b> of a century.</p></div><div class="fact-item py-3 border-b border-white/20"><p>If you live to 80, you’ve completed <b class="text-pink-200">25%</b> of your journey.</p></div><div class="fact-item py-3 border-b border-white/20"><p>You’ve spent <b class="text-pink-200">~14,000+</b> hours in school already.</p></div><div class="fact-item py-3"><p>Your heart has beaten <b class="text-pink-200 stat-value" data-value="757000000">0</b>+ times.</p></div></div></div>
+        <div id="slide-8" class="slide"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters"><span class="emoji">💡</span> Birthday math & vibes:</h2><div class="text-sm sm:text-base md:text-xl w-full max-w-md mx-auto flex flex-col items-stretch text-left fact-list"><div class="fact-item py-3 border-b border-white/20"><p>Born 10th month, 6th day → <b class="text-blue-300">10 + 6 = 16</b> (Lucky number).</p></div><div class="fact-item py-3 border-b border-white/20"><p>Zodiac: <b class="text-blue-300">Libra <span class="emoji">♎</span></b></p></div><div class="fact-item py-3 border-b border-white/20"><p>Chinese Zodiac: <b class="text-blue-300">Rooster <span class="emoji">🐓</span></b></p></div><div class="fact-item py-3"><p>Birthstone: <b class="text-blue-300">Opal <span class="emoji">✨</span></b></p></div></div></div>
+        <div id="slide-9" class="slide"><p class="text-2xl sm:text-3xl md:text-5xl font-bold leading-tight max-w-4xl animate-letters"><span class="emoji">⚡</span> Hey Charles,</span> You are <b class="text-pink-400">7,306 days</b> of stories, <b class="text-yellow-300">175,344 hours</b> of living, and <b class="text-green-300">10.5 million minutes</b> of growth — and the best is still ahead.</p></div>
+        <div id="slide-10" class="slide"><h2 class="text-xl sm:text-2xl md:text-4xl font-bold mb-8 animate-letters">A message from your boyfriend, yours truly:</h2><div class="bg-white/10 p-6 md:p-8 rounded-2xl max-w-2xl w-full border border-white/20 space-y-6"><blockquote class="text-base md:text-xl text-left italic border-l-4 border-cyan-400 pl-4"><p>“You are so beautiful. The best part of every day is when I catch a glimpse of you, even if it’s just for a few moments.”</p><cite class="text-right block not-italic mt-2 text-sm">— Intuition by C.J. Omololu</cite></blockquote></div></div>
+        <div id="slide-11" class="slide"><h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-8 animate-letters">A few of our favorite moments...</h2><div id="photo-carousel" class="relative w-full max-w-lg h-64 md:h-96 bg-black rounded-lg overflow-hidden shadow-2xl"></div></div>
 
         <!-- Slide 12: Final Greeting -->
-        <div id="slide-12" class="slide" data-transition-in="zoom-in">
+        <div id="slide-12" class="slide">
             <canvas id="confetti-canvas"></canvas>
             <h1 class="text-4xl sm:text-5xl md:text-8xl font-black font-montserrat tracking-tighter uppercase final-greeting">🎉 HAPPY 20TH BIRTHDAY, CHARLES 🎉</h1>
             <button id="restart-btn" class="mt-12 bg-pink-500 text-white font-bold py-3 px-6 rounded-full hover:bg-pink-600 transition-colors"> Restart Animation </button>
@@ -278,6 +276,8 @@
             let zigzagAnimationId;
             let zigzagTime = 0;
             let zigzagTargetIndex = 0;
+            let isTransitioning = false;
+            let lastSlide = 0;
             
             // --- Function Declarations ---
             let triggerCountUp, triggerFactAnimation, renderCarousel, showPhoto, startConfetti, stopConfetti, animateRetro, startZigzagAnimation, stopZigzagAnimation, animateLetters;
@@ -307,8 +307,11 @@
             };
 
             const showSlide = (index) => {
-                if (index < 0 || index >= totalSlides) return;
+                if (isTransitioning || index < 0 || index >= totalSlides) return;
                 
+                const direction = index > lastSlide ? 'forward' : 'backward';
+                lastSlide = index;
+
                 if (index > 0) { 
                     progressBarContainer.classList.remove('hidden'); 
                     controlsContainer.classList.remove('hidden'); 
@@ -323,25 +326,32 @@
                     backgroundMusic.currentTime = 0;
                 }
                 
-                const currentActive = document.querySelector('.slide.active');
+                const currentActive = slides[currentSlide];
                 const newSlide = slides[index];
-                
+
                 if (currentActive && currentActive !== newSlide) {
-                    const outAnim = currentActive.dataset.transitionOut || 'fade-out';
-                    currentActive.classList.add(outAnim);
-                    currentActive.classList.remove('active');
-                    setTimeout(() => {
-                        currentActive.classList.remove(outAnim);
-                        currentActive.style.opacity = 0; // hide after animation
-                    }, 600);
+                    isTransitioning = true;
+                    if(direction === 'forward'){
+                        currentActive.classList.add('exit-to-left');
+                    } else {
+                        currentActive.classList.add('exit-to-right');
+                        newSlide.style.transform = 'translateX(-100%)';
+                    }
                 }
                 
-                const inAnim = newSlide.dataset.transitionIn || 'fade-in';
-                newSlide.style.opacity = 0; // Start transparent
-                newSlide.classList.add('active', inAnim);
-                setTimeout(() => newSlide.classList.remove(inAnim), 600);
+                newSlide.offsetHeight; // force reflow
+                newSlide.classList.add('active');
                 
                 currentSlide = index;
+
+                setTimeout(() => {
+                    if (currentActive && currentActive !== newSlide) {
+                        currentActive.classList.remove('active', 'exit-to-left', 'exit-to-right');
+                        currentActive.style.transform = 'translateX(100%)'; // Reset position
+                    }
+                    if (index === 0) slides[0].style.transform = 'translateX(0)'; // Ensure intro slide is always correct
+                    isTransitioning = false;
+                }, 600);
 
                 currentPalette = slidePalettes[newSlide.id] || [];
                 
@@ -356,12 +366,11 @@
             };
             
             const playMontageTransition = (targetIndex) => {
-                const currentActive = document.querySelector('.slide.active');
+                 if (isTransitioning) return;
+                isTransitioning = true;
+                const currentActive = slides[currentSlide];
                 if(currentActive){
-                    const outAnim = currentActive.dataset.transitionOut || 'fade-out';
-                    currentActive.classList.add(outAnim);
-                    currentActive.classList.remove('active');
-                    setTimeout(() => currentActive.classList.remove(outAnim), 600);
+                    currentActive.classList.add('exit-to-left');
                 }
                 
                 retroCanvas.style.display = 'none';
@@ -379,6 +388,11 @@
                     montageContainer.classList.remove('active');
                     stopZigzagAnimation();
                     retroCanvas.style.display = 'block';
+                    if (currentActive) {
+                        currentActive.classList.remove('active', 'exit-to-left');
+                        currentActive.style.transform = 'translateX(100%)';
+                    }
+                    isTransitioning = false;
                     showSlide(targetIndex);
                 }, 6000);
             };
@@ -389,11 +403,7 @@
                 if (currentSlide > 0 && currentSlide < 10) { playMontageTransition(nextIndex); } else { showSlide(nextIndex); }
             };
 
-            const prev = () => { 
-                const prevIndex = currentSlide - 1; if (prevIndex < 0) return;
-                clearTimeout(autoAdvanceTimer);
-                showSlide(prevIndex);
-            };
+            const prev = () => { const prevIndex = currentSlide - 1; if (prevIndex < 0) return; showSlide(prevIndex); };
             const restart = () => showSlide(0);
 
             const updateNavButtons = () => { topPrevBtn.classList.toggle('disabled', currentSlide <= 1); topNextBtn.classList.toggle('disabled', currentSlide >= totalSlides - 1); };
